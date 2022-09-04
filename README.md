@@ -69,7 +69,7 @@ Data, code and images are licensed under [CC-BY 4.0](https://creativecommons.org
 ## Author
 **Dennis Angemi**
 
-Physics student at University of Catania (DFA)
+Physics student at University of Catania (DFA). Passionate about open data and data science.
 
 📫 How to reach me:
   - [Email](mailto:dennisangemi@gmail.com)
