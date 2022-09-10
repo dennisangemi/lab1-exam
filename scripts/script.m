@@ -186,7 +186,13 @@ regm=round((dgm/gm)*100,2);
 
 % theoretical curve
 tt=(2.*pi./sqrt(g)).*sqrt(((l.^2)./(12.*r))+r);
-%%
+
+% chi
+chio1 = sum((tm-teot(1,d)./dtm).^2)
+%% 
+% il chi quadro 2.8702e+03 cioè di 2870 è più del doppio del numero di misure 
+% effettuate. Questo è un cattivo segno.
+
 % plotting
 
 plt=figure;
@@ -236,6 +242,16 @@ o4 = table(uc,tm,sigma_t','VariableNames',{'configuration','mean_period','sigma_
 o4.mean_period = round(o4.mean_period,2);
 o4.sigma_t = round(o4.sigma_t,2);
 
+% join o4 with df1 in order to obtain distance
+o4 = join(o4,df1,"Keys","configuration");
+o4.distance_m = (o4.distance_cm-50)/100;
+
+% filter out distance_cm
+o4 = o4(:,["configuration","mean_period","sigma_t","distance_m"]);
+
+% compute teoretical period
+o4.teo_period = teot(1,o4.distance_m);
+
 % preview
 o4
 
@@ -252,9 +268,11 @@ xlim([0.05 0.5])
 legend('data','theoretical curve')
 
 % calcolare chi quadro su questo grafico
-
-
-%%%
+% compute chi square
+chio4 = sum(((o4.mean_period-o4.teo_period)./o4.sigma_t).^2)
+% chi ridotto
+chio4./(height(o4)-1)
+%% Determino g (analisi statistica)
 
 % join df1 e df2
 df2 = join(df2,df1,"Keys","configuration");
@@ -283,14 +301,17 @@ o5.sigma = round(o5.sigma,1);
 
 % preview
 o5
-
+% chi quadro
+cg = sum(((o5.g-repelem(9.81,height(o5))')./o5.sigma).^2)
+%%
+% plotting
 figure
 errorbar(o5.configuration,o5.g,o5.sigma,'o')
 hold on
-plot(o5.configuration,repelem(9.81,height(o5),1))
+plot(0:length(o5.configuration)+1,repelem(9.81,length(0:length(o5.configuration))+1,1))
 hold off
 xlim([0 height(o5)+1])
-ylim([7.5 10.5])
+ylim([7.5 11])
 legend("Experimental data","Accepted value","Location","southeast")
 xlabel("Configuration")
 ylabel("g (m/s^2)")
@@ -331,3 +352,20 @@ ylabel("g (m/s^2)")
 mlxloc = fullfile(pwd,'new_livescript.mlx');
 fileout = 'script.m';
 matlab.internal.liveeditor.openAndConvert(mlxloc,fileout);
+%% Function chi quadro
+
+function chi = chi(x,y,sigma) 
+    % x valore atteso
+    % y valore osservato
+    % sigma deviazione
+    for i = 1:length(x)
+        c(i) = ((y(i)-x(i))./sigma(i)).^2;
+    end
+    chi = sum(c);
+end
+
+function tt = teot(l,r)
+    % l lunghezza pendolo
+    % r distanza asse di rotazione - centro di massa
+    tt=(2.*pi./sqrt(9.81)).*sqrt(((l.^2)./(12.*r))+r);
+end
