@@ -138,6 +138,34 @@ dt = 2*dt
 % scelgo arbitrariamente la configurazione 6, grafico distribuzione ed
 % eseguo test chi quadro
 
+test = table2array(df2(df2.configuration == 6,"time_ms"))
+sigmatest = std(test)
+meantest = mean(test)
+% set number of bins
+nb = 4;
+bin = (1:4)'
+% number of values for each bin
+% nv = zeros(nb,1);
+% nv(1) = lengthtest(test < meantest - sigmatest,:));
+% nv(2) = lengthtest(test(test > meantest - sigmatest & test < meantest,:));
+% nv(3) = lengthtest(test(test > meantest  & test < meantest + sigmatest,:));
+% nv(4) = lengthtest(test(test > meantest + sigmatest,:));
+
+% si poteva fare la stessa con histcounts 
+
+% specifico edges
+edges = [min(test) ,meantest - sigmatest, meantest, meantest + sigmatest, max(test) ];
+
+% compute the count
+N = histcounts(test,edges)
+% probability
+p = [0.16 0.34 0.34 0.16]
+
+% valori attesi
+va = Np
+% inserire 
+histfit(test)
+%%
 
 
 % calcolo gc2 con formula più corta (g calculated 2)
