@@ -7,21 +7,12 @@ Experimental data and report of physics lab 1 exam
 
 ## Repository structure
 ```
-# root
-## 📂 data
-### 📄 exp-data-1.csv
-### 📄 exp-data-2.csv
-## 📂 report
-### 📄 report.tex
-### 📄 report.pdf
-## 📂 scripts
-## 📄 datapackage.yaml
-## 📄 README.md
-
 root
 ├── 📂 data
 │   ├── 📄 exp-data-1.csv
 │   └── 📄 exp-data-2.csv
+├── 📂 img
+│   └── 📄 plot.png
 ├── 📂 report
 │   ├── 📄 report.tex
 │   └── 📄 report.pdf
