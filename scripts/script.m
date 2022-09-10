@@ -8,29 +8,25 @@ clc
 clear
 
 % importing data
-df1=readtable("..\data\new-exp-data-1.csv");
-df2=readtable("..\data\new-exp-data-2.csv");
-% test round
-% df2.time_ms = round(df2.time_ms,-1);
-
+df1=readtable("..\data\exp-data-1.csv");
+df2=readtable("..\data\n-exp-data-2.csv");
 tools=readtable("..\data\tools.csv");
+
+
 % count configurations
 uc=unique(df2.configuration); % unique configuration
 nc=length(uc);                % number of configs
 %% Prima esplorazione e distribuzione delle misure indirette
 
 % line chart
-linechart=figure;
-for i=1:nc
-    subplot(3,5,i)
-    plot(table2array(df2(df2.configuration==uc(i),"event")),table2array(df2(df2.configuration==uc(i),"time_ms")))        
-    % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
-    title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
-end
-%% 
-% Noto comportamento anomalo per d_cm = 47 configurazione 14. Esploro in seguito
-
+% linechart=figure;
+% for i=1:nc
+%     subplot(3,5,i)
+%     plot(table2array(df2(df2.configuration==uc(i),"event")),table2array(df2(df2.configuration==uc(i),"time_ms")))        
+%     title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
+% end
 % histogram
+
 hst=figure;
 for i=1:nc
     subplot(3,5,i)
@@ -45,6 +41,7 @@ end
 for i=1:nc
     % calcolo la media
     tm(i)=round(mean(table2array(df2(df2.configuration==uc(i),"time_ms"))),0);
+
     % calcolo la deviazione
     deviation(i)=round(std(table2array(df2(df2.configuration==uc(i),"time_ms"))),0);
 end
@@ -53,17 +50,11 @@ end
 dev = table(uc, tm', deviation','VariableNames',{'configuration','mean_ms','deviation'});
 
 % calcolo rapporto tra deviazione/media)
-dev.ratio = round((dev.deviation./dev.mean_ms).*100,2)
+dev.ratio = round((dev.deviation./dev.mean_ms).*100,2);
 %% Rigetto di dati
 
-dev(height(dev),:)
-%% 
-% Mi rendo conto del fatto che la configurazione 14 ha una deviazione molto 
-% più alta delle precendenti. Qualcosa non torna. Torno a valutare le misure dirette 
-% in df2 per capire se c'è qualche errore da scartare confrontandolo con la media 
-% e capendo quante deviazioni standard è fuori dalla media
-
-% calcolo distanza dalla media in valore assoluto per ogni valore
+% calcolo distanza dalla media in valore assoluto per ogni valore (scarti
+% normalizzati t)
 
 % join con dev per ottenere tempi medi (mean_ms)
 df2 = join(df2,dev,"Keys","configuration");
@@ -73,98 +64,24 @@ df2.difference = abs(df2.time_ms - df2.mean_ms);
 % calcola di quante deviazioni standard il valore è fuori
 df2.out = round(df2.difference ./ df2.deviation,1);
 
-% ordino il df2 per numero di deviazioni standard fuori (out decrescente)
-sos = sortrows(df2,"out","descend");
-
-% seleziono dati sospetti con out >= 3
-sos = sos(sos.out>=3,:)
-%% 
-% Procedo all'eliminazione dei seguenti eventi:
-%% 
-% * evento 101 della configurazione 14 (tempo osservato differisce dalla media 
-% di circa 10 $\sigma$)
-% * evento 70 della configurazione 3 (tempo osservato differisce dalla media 
-% di più di 5 $\sigma$)
-%% 
-% Mi chiedo: posso rimuovere anche tutti i dati che distano più di 3 $\sigma$ 
-% ? Per adesso non lo faccio
-
-% rimuovo il dato fuori di 9 sigma
-toDelete = df2.event == 101 & df2.configuration == 14;
-df2(toDelete,:) = [];
-
-% rimuovo il dato fuori di 5 sigma
-toDelete = df2.event == 70 & df2.configuration == 3;
-df2(toDelete,:) = [];
-
-%%% test
-toDelete = df2.event == 40 & df2.configuration == 13;
-df2(toDelete,:) = [];
-toDelete = df2.event == 36 & df2.configuration == 13;
-df2(toDelete,:) = [];
-toDelete = df2.event == 100 & df2.configuration == 13;
-df2(toDelete,:) = [];
-toDelete = df2.event == 38 & df2.configuration == 13;
-df2(toDelete,:) = [];
-toDelete = df2.event == 83 & df2.configuration == 10;
-df2(toDelete,:) = [];
-toDelete = df2.event == 34 & df2.configuration == 10;
-df2(toDelete,:) = [];
-toDelete = df2.event == 62 & df2.configuration == 10;
-df2(toDelete,:) = [];
-toDelete = df2.event == 69 & df2.configuration == 3;
-df2(toDelete,:) = [];
-% toDelete = df2.configuration == 1;
-% df2(toDelete,:) = [];
-% toDelete = df2.configuration == 2;
-% df2(toDelete,:) = [];
-% toDelete = df2.configuration == 3;
-% df2(toDelete,:) = [];
-% toDelete = df2.configuration == 4;
-df2(toDelete,:) = [];
-% toDelete = df2.configuration == 5;
-% df2(toDelete,:) = [];
-% toDelete = df2.configuration == 6;
-% df2(toDelete,:) = [];
-% toDelete = df2.configuration == 7;
-% df2(toDelete,:) = [];
-% toDelete = df2.configuration == 8;
-% df2(toDelete,:) = [];
-% toDelete = df2.configuration == 9;
-% df2(toDelete,:) = [];
-% toDelete = df2.configuration == 10;
-% df2(toDelete,:) = [];
-% toDelete = df2.configuration == 11;
-% df2(toDelete,:) = [];
-% toDelete = df2.configuration == 12;
-% df2(toDelete,:) = [];
-% toDelete = df2.configuration == 13;
-% df2(toDelete,:) = [];
-% toDelete = df2.configuration == 14;
-% df2(toDelete,:) = [];
-
-
-uc=unique(df2.configuration) % unique configuration
-nc=length(uc)                % number of configs
-
-% % linechart dopo chauvenet
-figure
-for i=1:nc
-    subplot(3,5,i)
-    plot(table2array(df2(df2.configuration==uc(i),"event")),table2array(df2(df2.configuration==uc(i),"time_ms")))        
-    % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
-    % title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
-    title(string(table2array(df1(df1.configuration==uc(i),"configuration"))))
-end
+% elimino i valori che sono fuori di più di 3.5 sigma
+df2 = df2(df2.out <= 3.5,:)
+% aggiorno variabili
+uc=unique(df2.configuration); % unique configuration
+nc=length(uc);                % number of configs
 
 % histogram
 hst=figure;
 for i=1:nc
     subplot(3,5,i)
-    histogram(table2array(df2(df2.configuration==uc(i),"time_ms")),6)     
+    histogram(table2array(df2(df2.configuration==uc(i),"time_ms")),15)     
     % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
     title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
 end
+%% Rigetto di dati
+
+toDelete = df2.configuration == 14;
+df2(toDelete,:) = [];
 %% 
 % Alla luce dell'applicazione del criterio di Chauvenet, ricalcolo media e deviazione
 
@@ -185,9 +102,9 @@ end
 % calcolo rapporto tra deviazione/media)
 % dev.ratio = round((dev.deviation./dev.mean_ms).*100,2)
 %%
-% defining variable
-uc=unique(df2.configuration) % unique configuration
-nc=length(uc)                % number of configs
+% aggiorno variabili
+uc=unique(df2.configuration); % unique configuration
+nc=length(uc);                % number of configs
 l=1;                          % pendulum length
 g=9.81;                       % gravitational acceleration
 dg=0.01;                      % error gravitational acceleration
@@ -215,108 +132,35 @@ uomt=string(zeros(nc,1));   % uom t
 % df2.period_s=round(df2.time_ms.*2./1000,1)
 df2.period_s=df2.time_ms*2/1000
 dt = 2*dt
-%% Propagazione degli errori
-
-% core
-for i=1:nc
-    % calculating mean
-    tm(i)=mean(table2array(df2(df2.configuration==uc(i),"period_s")));
-    
-    % error t
-    dtm(i)=dt;
-    
-    % distance from CM
-    d(i)=table2array(df1(df1.configuration==uc(i),"distance_cm"));
-    d(i)=d(i)-50;
-    d(i)=d(i)/100; %convering cm2m
-    
-    % error distance from CM
-    dd(i)=dr;
-    
-    % calculating gravitational acceleration
-    gc(i)=(l.^2.*pi.^2)./(3.*d(i).*tm(i).^2)+(4.*pi.^2.*d(i))./(tm(i).^2);
-    dgc(i)=((pi.^2).*2.*l.*dd(i))./(3.*d(i).*tm(i).^2)  +  (((((l.^2).*pi.^2)/(3.*d(i).*tm(i).^4))+(4.*pi^2.*d(i)./tm(i).^4)).*8.*tm(i).*dtm(i))  +  abs(-((l.^2.*pi.^2)./(3.*d(i).^2.*tm(i).^2)) + (4.*pi.^2)./(tm(i).^2)).*dd(i);
-    
-    % propagation of error g
-%     cfrg(i)=-floor(log10(dgc(i)));  % position first significant digit g
-%     dgc(i)=round(dgc(i),cfrg(i));   % round dgc
-%     gc(i)=round(gc(i),cfrg(i)+1);   % round g calculated
-    
-    % relative error g
-    regc(i)=round(dgc(i)./gc(i)*100,2);
-    
-    % unit of measure
-    uomd(i)="MTR";
-    uomg(i)="MSK";
-    uomt(i)="SEC";
-end
-
-% significant digits time
-cfrt=-floor(log10(dt));         % position first significant digit time
-tm=round(tm,cfrt);              % round
-
-% mean gravitational acceleration (output3)
-% gm=round(mean(gc(2:10)),1);
-% dgm=round(mean(dgc(2:10)),0);
-% regm=round((dgm/gm)*100,2);
-
-% theoretical curve
-tt=(2.*pi./sqrt(g)).*sqrt(((l.^2)./(12.*r))+r);
-
-% chi
-chio1 = sum((tm-teot(1,d)./dtm).^2)
-%% 
-% il chi quadro 2.8702e+03 cioè di 2870 è più del doppio del numero di misure 
-% effettuate. Questo è un cattivo segno.
-
-% plotting
-
-plt1=figure;
-errorbar(d,tm,dtm,dtm,dd,dd,'.')
-xlabel('Distanza dal CM (m)')
-ylabel('Periodo T (s)')
-xlim([0,0.5])
-hold on
-plot(r,tt)
-hold off
-ylim([0,5])
-xlim([0.0 0.5])
-legend('data','theoretical curve')
-
-plt2=figure;
-errorbar(d,tm,dtm,dtm,dd,dd,'.')
-xlabel('Distanza dal CM (m)')
-ylabel('Periodo T (s)')
-xlim([0,0.5])
-hold on
-plot(r,tt)
-hold off
-ylim([1 2.5])
-xlim([0.05 0.5])
-legend('data','theoretical curve')
 %% Analisi statistica
-% Una parte di analisi statistica è stata fatta all'inizio di questo notebook. 
-% 
-% Potrei spostare questa parte in alto (dopo il rigetto dei dati)
+
+% test del chi quadro su una distribuzione
+
+
+
 
 % calcolo gc2 con formula più corta (g calculated 2)
 % for i = 1:nc
 %     gc2(i) = (2.*pi./tm(i)).^2  .*  ((l.^2)/(12.*d(i)) + d(i));
 % end
 
-% T function of d with standard deviation
 
-tt=(2.*pi./sqrt(g)).*sqrt(((l.^2)./(12.*r))+r); % theoretical curve
+% per ogni configurazione calcolo la media del periodo e la sua deviazione
+% standard
+
+
+
+sigma_t = zeros(nc,1);
 
 for i = 1:nc
     tm(i) = mean(table2array(df2(df2.configuration == uc(i),"period_s")));
     sigma_t(i) = std(table2array(df2(df2.configuration == uc(i),"period_s")));
 end
 
-o4 = table(uc,tm,sigma_t','VariableNames',{'configuration','mean_period','sigma_t'})
+o4 = table(uc,tm,sigma_t,'VariableNames',{'configuration','mean_period','sigma_t'})
 % rounding
 o4.mean_period = round(o4.mean_period,2);
-o4.sigma_t = round(o4.sigma_t,2);
+% o4.sigma_t = round(o4.sigma_t,2);
 
 % join o4 with df1 in order to obtain distance
 o4 = join(o4,df1,"Keys","configuration");
@@ -328,11 +172,13 @@ o4 = o4(:,["configuration","mean_period","sigma_t","distance_m"]);
 % compute teoretical period
 o4.teo_period = teot(1,o4.distance_m);
 
+tt=(2.*pi./sqrt(g)).*sqrt(((l.^2)./(12.*r))+r); % theoretical curve
+
 % preview
 o4
 % plotting
-plt3=figure;
-errorbar(d,o4.mean_period,o4.sigma_t,o4.sigma_t,dd,dd,'.')
+plt1=figure;
+plot(o4.distance_m,o4.mean_period,'o')
 xlabel('Distanza dal CM (m)')
 ylabel('Periodo T (s)')
 xlim([0,0.5])
@@ -341,8 +187,8 @@ hold on
 plot(r,tt)
 hold off
 legend('data','theoretical curve')
-plt4=figure;
-errorbar(d,o4.mean_period,o4.sigma_t,o4.sigma_t,dd,dd,'.')
+plt2=figure;
+errorbar(o4.distance_m,o4.mean_period,o4.sigma_t,o4.sigma_t,'.')
 xlabel('Distanza dal CM (m)')
 ylabel('Periodo T (s)')
 xlim([0,0.5])
@@ -352,7 +198,6 @@ hold off
 ylim([1.4 2.3])
 xlim([0.05 0.5])
 legend('data','theoretical curve')
-
 % calcolare chi quadro su questo grafico
 % compute chi square
 chio4 = sum(((o4.mean_period-o4.teo_period)./o4.sigma_t).^2)
@@ -360,13 +205,14 @@ chio4 = sum(((o4.mean_period-o4.teo_period)./o4.sigma_t).^2)
 chio4./(height(o4)-1)
 %% Metodo dei minimi quadrati
 
+d = o4.distance_m;
 y = tm;
 x = sqrt(  (repelem(l,length(d))'.^2)./(12.*d) + d   );
 
 % plot y and x
-plot(x,y,'o')
-xlabel("x")
-ylabel("y")
+% plot(x,y,'o')
+% xlabel("x")
+% ylabel("y")
 % determino parametri per applicare metodo minimi quadrati
 
 % numero di punti
@@ -379,8 +225,15 @@ a = (   (sum(x.^2).*sum(y))  - (sum(x).*sum(x.*y))   )./delta
 
 % coefficiente angolare
 b = (   (n.*sum(x.*y)) - (sum(x).*sum(y))   )./delta
-
-figure
+plt3=figure;
+errorbar(x,o4.mean_period,o4.sigma_t,o4.sigma_t,'.')
+hold on
+plot(0:1,a+b.*(0:1)')
+hold off
+legend("data","fit",'Location','southeast')
+xlim([0.7 1])
+ylim([1.45 2.1])
+plt4=figure;
 plot(x,y,'o')
 hold on
 plot(0:1,a+b.*(0:1)')
@@ -391,8 +244,10 @@ ylim([1.45 2.1])
 % stimo g dal coefficiente angolare
 % gmq sta per "g minimi quadrati"
 gmq = (2.*pi./b).^2
-gmq2 = (2.*pi./(2.05)).^2
-%% Determino g (analisi statistica)
+% add coefficiente di pearson
+
+
+%% Determino g (media)
 
 % join df1 e df2
 df2 = join(df2,df1,"Keys","configuration");
@@ -416,8 +271,8 @@ end
 
 o5 = table(uc,g_calc_mean',g_sigma','VariableNames',{'configuration','g','sigma'})
 % rounding
-o5.g = round(o5.g,1);
-o5.sigma = round(o5.sigma,1);
+o5.g = round(o5.g,2);
+o5.sigma = round(o5.sigma,2);
 
 % preview
 o5
@@ -429,7 +284,7 @@ mean(o5.sigma)
 %%
 % plotting
 plt5=figure;
-errorbar(o5.configuration,o5.g,o5.sigma,'o')
+errorbar(o5.configuration,o5.g,o5.sigma,'.')
 hold on
 plot(0:length(o5.configuration)+1,repelem(9.81,length(0:length(o5.configuration))+1,1))
 hold off
@@ -469,18 +324,18 @@ ylabel("g (m/s^2)")
 % writetable(output3,'..\data\output-data-3.csv','Delimiter',',','Encoding','UTF-8')
 
 % exporting img
-% saveas(linechart,'..\img\linechart.png');
-% saveas(hst,'..\img\histogram.png');
+saveas(hst,'..\img\histogram.png');
 saveas(plt1,'..\img\plot1.png');
 saveas(plt2,'..\img\plot2.png');
 saveas(plt3,'..\img\plot3.png');
 saveas(plt4,'..\img\plot4.png');
 saveas(plt5,'..\img\plot5.png');
+
 % exporting mlx2m
-mlxloc = fullfile(pwd,'new_livescript.mlx');
+mlxloc = fullfile(pwd,'livescript.mlx');
 fileout = 'script.m';
 matlab.internal.liveeditor.openAndConvert(mlxloc,fileout);
-%% Function chi quadro
+%% Functions
 
 function chi = chi(x,y,sigma) 
     % x valore atteso
