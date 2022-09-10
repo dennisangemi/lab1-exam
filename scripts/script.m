@@ -9,7 +9,7 @@ clear
 
 % importing data
 df1=readtable("..\data\exp-data-1.csv");
-df2=readtable("..\data\n-exp-data-2.csv");
+df2=readtable("..\data\exp-data-2.csv");
 tools=readtable("..\data\tools.csv");
 
 
@@ -135,7 +135,8 @@ dt = 2*dt
 %% Analisi statistica
 
 % test del chi quadro su una distribuzione
-
+% scelgo arbitrariamente la configurazione 6, grafico distribuzione ed
+% eseguo test chi quadro
 
 
 
