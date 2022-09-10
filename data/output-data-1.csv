@@ -1,0 +1,5 @@
+intervallo,probabilità,numero_atteso,numero osservato
+1,0.16,16.16,21
+2,0.34,34.34,37
+3,0.34,34.34,30
+4,0.16,16.16,13

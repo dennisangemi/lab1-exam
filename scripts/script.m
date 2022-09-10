@@ -138,33 +138,48 @@ dt = 2*dt
 % scelgo arbitrariamente la configurazione 6, grafico distribuzione ed
 % eseguo test chi quadro
 
-test = table2array(df2(df2.configuration == 6,"time_ms"))
-sigmatest = std(test)
-meantest = mean(test)
-% set number of bins
-nb = 4;
-bin = (1:4)'
-% number of values for each bin
-% nv = zeros(nb,1);
-% nv(1) = lengthtest(test < meantest - sigmatest,:));
-% nv(2) = lengthtest(test(test > meantest - sigmatest & test < meantest,:));
-% nv(3) = lengthtest(test(test > meantest  & test < meantest + sigmatest,:));
-% nv(4) = lengthtest(test(test > meantest + sigmatest,:));
+test = table2array(df2(df2.configuration == 6,"time_ms"));
+sigmatest = std(test);
+meantest = mean(test);
 
-% si poteva fare la stessa con histcounts 
+% compute chi square test 
 
 % specifico edges
 edges = [min(test) ,meantest - sigmatest, meantest, meantest + sigmatest, max(test) ];
 
+% numero di misure
+N = length(test);
 % compute the count
-N = histcounts(test,edges)
+% numero osservato
+no = histcounts(test,edges)';
 % probability
-p = [0.16 0.34 0.34 0.16]
+p = [0.16 0.34 0.34 0.16]';
 
-% valori attesi
-va = Np
-% inserire 
+% numero atteso
+na = N.*p;
+% creating table
+out1 = table((1:length(no))', p, na, no, 'VariableNames', {'intervallo', 'probabilità', 'numero_atteso', 'numero osservato'})
+% exporting csv
+writetable(out1,'..\data\output-data-1.csv','Delimiter',',','Encoding','UTF-8')
+
+% compute chi square
+chi2 = sum(((no-na).^2)./na)
+% number or interbals
+n = length(no);
+
+% numero di vincoli
+c = 3; % gaussiana
+
+% numero di gradi di libertà
+d = n - c;
+
+% chi quadro ridotto
+chired = chi2/d
+% histogram fitted 
+chihist=figure;
 histfit(test)
+xlabel("t (ms)")
+ylabel("N")
 %%
 
 
@@ -359,6 +374,7 @@ saveas(plt2,'..\img\plot2.png');
 saveas(plt3,'..\img\plot3.png');
 saveas(plt4,'..\img\plot4.png');
 saveas(plt5,'..\img\plot5.png');
+saveas(chihist,'..\img\chi.png');
 
 % exporting mlx2m
 mlxloc = fullfile(pwd,'livescript.mlx');
