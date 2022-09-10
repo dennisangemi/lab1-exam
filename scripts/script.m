@@ -91,6 +91,35 @@ df2(toDelete,:) = [];
 % rimuovo il dato fuori di 5 sigma
 toDelete = df2.event == 70 & df2.configuration == 3;
 df2(toDelete,:) = [];
+
+%%% test
+% toDelete = df2.event == 40 & df2.configuration == 13;
+% df2(toDelete,:) = [];
+% toDelete = df2.event == 36 & df2.configuration == 13;
+% df2(toDelete,:) = [];
+% toDelete = df2.event == 100 & df2.configuration == 13;
+% df2(toDelete,:) = [];
+% toDelete = df2.event == 38 & df2.configuration == 13;
+% df2(toDelete,:) = [];
+% toDelete = df2.event == 83 & df2.configuration == 10;
+% df2(toDelete,:) = [];
+% toDelete = df2.event == 34 & df2.configuration == 10;
+% df2(toDelete,:) = [];
+% toDelete = df2.event == 62 & df2.configuration == 10;
+% df2(toDelete,:) = [];
+% toDelete = df2.event == 69 & df2.configuration == 3;
+% df2(toDelete,:) = [];
+% 
+% % linechart dopo chauvenet
+% figure
+% for i=1:nc
+%     subplot(3,5,i)
+%     plot(table2array(df2(df2.configuration==uc(i),"event")),table2array(df2(df2.configuration==uc(i),"time_ms")))        
+%     % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
+%     title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
+% end
+%%
+% non 
 %% 
 % Alla luce dell'applicazione del criterio di Chauvenet, ricalcolo media e deviazione
 
@@ -366,7 +395,6 @@ saveas(plt2,'..\img\plot2.png');
 saveas(plt3,'..\img\plot3.png');
 saveas(plt4,'..\img\plot4.png');
 saveas(plt5,'..\img\plot5.png');
-
 % exporting mlx2m
 mlxloc = fullfile(pwd,'new_livescript.mlx');
 fileout = 'script.m';
