@@ -25,10 +25,10 @@ root
 
 Every file in `data` folder is described according to [frictionless data standards](https://frictionlessdata.io/standards/) in the [`datapackage.yaml`](https://github.com/indecis-it/data/blob/main/datapackage.yaml)
 
-### [📄 file.csv](https://github.com/indecis-it/data/blob/main/data/sources.csv)
+### [📄 file.csv](#)
 
 - Path: `data/`
-- URL: https://raw.githubusercontent.com/indecis-it/data/main/data/sources.csv
+- URL: https://raw.githubusercontent.com/#
 - Delimiter: `,`
 - Encoding: `UTF-8`
 
@@ -45,12 +45,12 @@ If you wanna use these data in your works, you can follow these easy instruction
 
 ### MATLAB
 ```matlab
-categories = readtable("https://raw.githubusercontent.com/indecis-it/data/main/data/categories.csv")
+df = readtable("#")
 ```
 
 ### R
 ```r
-categories <- read.csv("https://raw.githubusercontent.com/indecis-it/data/main/data/categories.csv")
+df <- read.csv("#")
 ```
 
 ## License
