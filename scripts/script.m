@@ -1,16 +1,21 @@
 %% Compund pendulum
 % Physics lab 1 exam
+% 
+% manca da calcolare rappresentare g con la propagazione degli errori.
 
 % cleaning
 clc
 clear
 
 % importing data
-df1=readtable("..\data\new-exp-data-1.csv")
-df2=readtable("..\data\new-exp-data-2.csv")
-tools=readtable("..\data\tools.csv")
+df1=readtable("..\data\new-exp-data-1.csv");
+df2=readtable("..\data\new-exp-data-2.csv");
+% test round
+% df2.time_ms = round(df2.time_ms,-1);
+
+tools=readtable("..\data\tools.csv");
 % count configurations
-uc=unique(df1.configuration); % unique configuration
+uc=unique(df2.configuration); % unique configuration
 nc=length(uc);                % number of configs
 %% Prima esplorazione e distribuzione delle misure indirette
 
@@ -93,33 +98,73 @@ toDelete = df2.event == 70 & df2.configuration == 3;
 df2(toDelete,:) = [];
 
 %%% test
-% toDelete = df2.event == 40 & df2.configuration == 13;
+toDelete = df2.event == 40 & df2.configuration == 13;
+df2(toDelete,:) = [];
+toDelete = df2.event == 36 & df2.configuration == 13;
+df2(toDelete,:) = [];
+toDelete = df2.event == 100 & df2.configuration == 13;
+df2(toDelete,:) = [];
+toDelete = df2.event == 38 & df2.configuration == 13;
+df2(toDelete,:) = [];
+toDelete = df2.event == 83 & df2.configuration == 10;
+df2(toDelete,:) = [];
+toDelete = df2.event == 34 & df2.configuration == 10;
+df2(toDelete,:) = [];
+toDelete = df2.event == 62 & df2.configuration == 10;
+df2(toDelete,:) = [];
+toDelete = df2.event == 69 & df2.configuration == 3;
+df2(toDelete,:) = [];
+% toDelete = df2.configuration == 1;
 % df2(toDelete,:) = [];
-% toDelete = df2.event == 36 & df2.configuration == 13;
+% toDelete = df2.configuration == 2;
 % df2(toDelete,:) = [];
-% toDelete = df2.event == 100 & df2.configuration == 13;
+% toDelete = df2.configuration == 3;
 % df2(toDelete,:) = [];
-% toDelete = df2.event == 38 & df2.configuration == 13;
+% toDelete = df2.configuration == 4;
+df2(toDelete,:) = [];
+% toDelete = df2.configuration == 5;
 % df2(toDelete,:) = [];
-% toDelete = df2.event == 83 & df2.configuration == 10;
+% toDelete = df2.configuration == 6;
 % df2(toDelete,:) = [];
-% toDelete = df2.event == 34 & df2.configuration == 10;
+% toDelete = df2.configuration == 7;
 % df2(toDelete,:) = [];
-% toDelete = df2.event == 62 & df2.configuration == 10;
+% toDelete = df2.configuration == 8;
 % df2(toDelete,:) = [];
-% toDelete = df2.event == 69 & df2.configuration == 3;
+% toDelete = df2.configuration == 9;
 % df2(toDelete,:) = [];
-% 
+% toDelete = df2.configuration == 10;
+% df2(toDelete,:) = [];
+% toDelete = df2.configuration == 11;
+% df2(toDelete,:) = [];
+% toDelete = df2.configuration == 12;
+% df2(toDelete,:) = [];
+% toDelete = df2.configuration == 13;
+% df2(toDelete,:) = [];
+% toDelete = df2.configuration == 14;
+% df2(toDelete,:) = [];
+
+
+uc=unique(df2.configuration) % unique configuration
+nc=length(uc)                % number of configs
+
 % % linechart dopo chauvenet
-% figure
-% for i=1:nc
-%     subplot(3,5,i)
-%     plot(table2array(df2(df2.configuration==uc(i),"event")),table2array(df2(df2.configuration==uc(i),"time_ms")))        
-%     % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
-%     title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
-% end
-%%
-% non 
+figure
+for i=1:nc
+    subplot(3,5,i)
+    plot(table2array(df2(df2.configuration==uc(i),"event")),table2array(df2(df2.configuration==uc(i),"time_ms")))        
+    % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
+    % title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
+    title(string(table2array(df1(df1.configuration==uc(i),"configuration"))))
+end
+
+% histogram
+hst=figure;
+for i=1:nc
+    subplot(3,5,i)
+    histogram(table2array(df2(df2.configuration==uc(i),"time_ms")),6)     
+    % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
+    title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
+end
 %% 
 % Alla luce dell'applicazione del criterio di Chauvenet, ricalcolo media e deviazione
 
@@ -135,17 +180,19 @@ for i=1:nc
 end
 
 % creo tabella
-dev = table(uc, tm', deviation','VariableNames',{'configuration','mean_ms','deviation'});
+% dev = table(uc, tm', deviation','VariableNames',{'configuration','mean_ms','deviation'});
 
 % calcolo rapporto tra deviazione/media)
-dev.ratio = round((dev.deviation./dev.mean_ms).*100,2)
+% dev.ratio = round((dev.deviation./dev.mean_ms).*100,2)
 %%
 % defining variable
-l=1;                        % pendulum length
-g=9.81;                      % gravitational acceleration
-dg=0.01;                     % error gravitational acceleration
-dt=tools.uncertainty(1);     % error t
-dr=tools.uncertainty(2);     % errror distance
+uc=unique(df2.configuration) % unique configuration
+nc=length(uc)                % number of configs
+l=1;                          % pendulum length
+g=9.81;                       % gravitational acceleration
+dg=0.01;                      % error gravitational acceleration
+dt=tools.uncertainty(1);      % error t
+dr=tools.uncertainty(2);      % errror distance
 
 % overwrite distance error
 dr = 0.002; % meters
@@ -191,9 +238,9 @@ for i=1:nc
     dgc(i)=((pi.^2).*2.*l.*dd(i))./(3.*d(i).*tm(i).^2)  +  (((((l.^2).*pi.^2)/(3.*d(i).*tm(i).^4))+(4.*pi^2.*d(i)./tm(i).^4)).*8.*tm(i).*dtm(i))  +  abs(-((l.^2.*pi.^2)./(3.*d(i).^2.*tm(i).^2)) + (4.*pi.^2)./(tm(i).^2)).*dd(i);
     
     % propagation of error g
-    cfrg(i)=-floor(log10(dgc(i)));  % position first significant digit g
-    dgc(i)=round(dgc(i),cfrg(i));   % round dgc
-    gc(i)=round(gc(i),cfrg(i)+1);   % round g calculated
+%     cfrg(i)=-floor(log10(dgc(i)));  % position first significant digit g
+%     dgc(i)=round(dgc(i),cfrg(i));   % round dgc
+%     gc(i)=round(gc(i),cfrg(i)+1);   % round g calculated
     
     % relative error g
     regc(i)=round(dgc(i)./gc(i)*100,2);
@@ -209,9 +256,9 @@ cfrt=-floor(log10(dt));         % position first significant digit time
 tm=round(tm,cfrt);              % round
 
 % mean gravitational acceleration (output3)
-gm=round(mean(gc(2:10)),1);
-dgm=round(mean(dgc(2:10)),0);
-regm=round((dgm/gm)*100,2);
+% gm=round(mean(gc(2:10)),1);
+% dgm=round(mean(dgc(2:10)),0);
+% regm=round((dgm/gm)*100,2);
 
 % theoretical curve
 tt=(2.*pi./sqrt(g)).*sqrt(((l.^2)./(12.*r))+r);
@@ -311,6 +358,40 @@ legend('data','theoretical curve')
 chio4 = sum(((o4.mean_period-o4.teo_period)./o4.sigma_t).^2)
 % chi ridotto
 chio4./(height(o4)-1)
+%% Metodo dei minimi quadrati
+
+y = tm;
+x = sqrt(  (repelem(l,length(d))'.^2)./(12.*d) + d   );
+
+% plot y and x
+plot(x,y,'o')
+xlabel("x")
+ylabel("y")
+% determino parametri per applicare metodo minimi quadrati
+
+% numero di punti
+n = length(tm);
+
+delta = n.*sum(x.^2) - (sum(x)).^2;
+
+% intercetta
+a = (   (sum(x.^2).*sum(y))  - (sum(x).*sum(x.*y))   )./delta
+
+% coefficiente angolare
+b = (   (n.*sum(x.*y)) - (sum(x).*sum(y))   )./delta
+
+figure
+plot(x,y,'o')
+hold on
+plot(0:1,a+b.*(0:1)')
+hold off
+legend("data","fit",'Location','southeast')
+xlim([0.7 1])
+ylim([1.45 2.1])
+% stimo g dal coefficiente angolare
+% gmq sta per "g minimi quadrati"
+gmq = (2.*pi./b).^2
+gmq2 = (2.*pi./(2.05)).^2
 %% Determino g (analisi statistica)
 
 % join df1 e df2
@@ -388,8 +469,8 @@ ylabel("g (m/s^2)")
 % writetable(output3,'..\data\output-data-3.csv','Delimiter',',','Encoding','UTF-8')
 
 % exporting img
-saveas(linechart,'..\img\linechart.png');
-saveas(hst,'..\img\histogram.png');
+% saveas(linechart,'..\img\linechart.png');
+% saveas(hst,'..\img\histogram.png');
 saveas(plt1,'..\img\plot1.png');
 saveas(plt2,'..\img\plot2.png');
 saveas(plt3,'..\img\plot3.png');
