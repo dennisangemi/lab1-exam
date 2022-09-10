@@ -15,24 +15,24 @@ nc=length(uc);                % number of configs
 %% Prima esplorazione e distribuzione delle misure indirette
 
 % line chart
-% figure
-% for i=1:nc
-%     subplot(3,5,i)
-%     plot(table2array(df2(df2.configuration==uc(i),"event")),table2array(df2(df2.configuration==uc(i),"time_ms")))        
-%     % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
-%     title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
-% end
+linechart=figure;
+for i=1:nc
+    subplot(3,5,i)
+    plot(table2array(df2(df2.configuration==uc(i),"event")),table2array(df2(df2.configuration==uc(i),"time_ms")))        
+    % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
+    title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
+end
 %% 
 % Noto comportamento anomalo per d_cm = 47 configurazione 14. Esploro in seguito
 
 % histogram
-% figure
-% for i=1:nc
-%     subplot(3,5,i)
-%     histogram(table2array(df2(df2.configuration==uc(i),"time_ms")))     
-%     % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
-%     title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
-% end
+hst=figure;
+for i=1:nc
+    subplot(3,5,i)
+    histogram(table2array(df2(df2.configuration==uc(i),"time_ms")))     
+    % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
+    title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
+end
 %% Qual è l'incertezza sui tempi?
 % Per stimarla, calcolo la deviazione standard sui tempi per ogni configurazione
 
@@ -195,7 +195,7 @@ chio1 = sum((tm-teot(1,d)./dtm).^2)
 
 % plotting
 
-plt=figure;
+plt1=figure;
 errorbar(d,tm,dtm,dtm,dd,dd,'.')
 xlabel('Distanza dal CM (m)')
 ylabel('Periodo T (s)')
@@ -254,8 +254,18 @@ o4.teo_period = teot(1,o4.distance_m);
 
 % preview
 o4
-
 % plotting
+plt3=figure;
+errorbar(d,o4.mean_period,o4.sigma_t,o4.sigma_t,dd,dd,'.')
+xlabel('Distanza dal CM (m)')
+ylabel('Periodo T (s)')
+xlim([0,0.5])
+ylim([0 5])
+hold on
+plot(r,tt)
+hold off
+legend('data','theoretical curve')
+plt4=figure;
 errorbar(d,o4.mean_period,o4.sigma_t,o4.sigma_t,dd,dd,'.')
 xlabel('Distanza dal CM (m)')
 ylabel('Periodo T (s)')
@@ -263,7 +273,7 @@ xlim([0,0.5])
 hold on
 plot(r,tt)
 hold off
-ylim([1 2.5])
+ylim([1.4 2.3])
 xlim([0.05 0.5])
 legend('data','theoretical curve')
 
@@ -303,9 +313,12 @@ o5.sigma = round(o5.sigma,1);
 o5
 % chi quadro
 cg = sum(((o5.g-repelem(9.81,height(o5))')./o5.sigma).^2)
+% mean g
+round(mean(o5.g),1)
+mean(o5.sigma)
 %%
 % plotting
-figure
+plt5=figure;
 errorbar(o5.configuration,o5.g,o5.sigma,'o')
 hold on
 plot(0:length(o5.configuration)+1,repelem(9.81,length(0:length(o5.configuration))+1,1))
@@ -346,7 +359,13 @@ ylabel("g (m/s^2)")
 % writetable(output3,'..\data\output-data-3.csv','Delimiter',',','Encoding','UTF-8')
 
 % exporting img
-% saveas(plt,'..\img\plot.png');
+saveas(linechart,'..\img\linechart.png');
+saveas(hst,'..\img\histogram.png');
+saveas(plt1,'..\img\plot1.png');
+saveas(plt2,'..\img\plot2.png');
+saveas(plt3,'..\img\plot3.png');
+saveas(plt4,'..\img\plot4.png');
+saveas(plt5,'..\img\plot5.png');
 
 % exporting mlx2m
 mlxloc = fullfile(pwd,'new_livescript.mlx');
