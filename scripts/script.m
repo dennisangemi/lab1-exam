@@ -12,11 +12,12 @@ df1=readtable("..\data\exp-data-1.csv");
 df2=readtable("..\data\exp-data-2.csv");
 tools=readtable("..\data\tools.csv");
 
+toDelete = df2.configuration == 14;
+df2(toDelete,:) = [];
+
 % count configurations
 uc=unique(df2.configuration); % unique configuration
 nc=length(uc);                % number of configs
-%%
-df1
 %% Prima esplorazione e distribuzione delle misure indirette
 
 hst=figure;
@@ -45,6 +46,7 @@ dev = table(uc, tm', deviation','VariableNames',{'configuration','mean_ms','devi
 
 % calcolo rapporto tra deviazione/media)
 dev.ratio = round((dev.deviation./dev.mean_ms).*100,2);
+% writetable(dev,'..\data\temp.csv','Delimiter',',','Encoding','UTF-8')
 %% Rigetto di dati
 
 % calcolo distanza dalla media in valore assoluto per ogni valore (scarti
@@ -59,7 +61,7 @@ df2.difference = abs(df2.time_ms - df2.mean_ms);
 df2.out = round(df2.difference ./ df2.deviation,1);
 
 % elimino i valori che sono fuori di più di 3.5 sigma
-df2 = df2(df2.out <= 3.5,:)
+df2 = df2(df2.out <= 4,:)
 % aggiorno variabili
 uc=unique(df2.configuration); % unique configuration
 nc=length(uc);                % number of configs
@@ -72,10 +74,6 @@ for i=1:nc
     % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
     title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
 end
-%% Rigetto di dati
-
-toDelete = df2.configuration == 14;
-df2(toDelete,:) = [];
 %% 
 % Alla luce dell'applicazione del criterio di Chauvenet, ricalcolo media e deviazione
 
@@ -124,8 +122,8 @@ dt = 2*dt
 % eseguo test chi quadro
 
 test = table2array(df2(df2.configuration == 6,"time_ms"));
-sigmatest = std(test);
-meantest = mean(test);
+sigmatest = std(test)
+meantest = mean(test)
 
 % compute chi square test 
 
@@ -186,8 +184,9 @@ for i = 1:nc
 end
 
 o4 = table(uc,tm,sigma_t,'VariableNames',{'configuration','mean_period','sigma_t'})
+
 % rounding
-o4.mean_period = round(o4.mean_period,2);
+% o4.mean_period = round(o4.mean_period,2);
 % o4.sigma_t = round(o4.sigma_t,2);
 
 % join o4 with df1 in order to obtain distance
@@ -201,11 +200,16 @@ o4 = o4(:,["configuration","mean_period","sigma_t","distance_m"]);
 o4.teo_period = teot(1,o4.distance_m);
 
 tt=(2.*pi./sqrt(g)).*sqrt(((l.^2)./(12.*r))+r); % theoretical curve
-
+%%
 % preview
 o4
+
+% rounding before exporting
+
+
 % exporting
 writetable(o4,'..\data\output-data-2.csv','Delimiter',',','Encoding','UTF-8')
+%%
 
 % plotting
 plt1=figure;
@@ -285,7 +289,7 @@ hold off
 legend("data","fit",'Location','southeast')
 xlim([0.7 1])
 ylim([1.45 2.1])
-saveas(plt4,'..\img\plot4.png');
+% saveas(plt4,'..\img\plot4.png');
 % stimo g dal coefficiente angolare
 % gmq sta per "g minimi quadrati"
 
