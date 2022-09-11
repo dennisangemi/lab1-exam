@@ -12,20 +12,10 @@ df1=readtable("..\data\exp-data-1.csv");
 df2=readtable("..\data\exp-data-2.csv");
 tools=readtable("..\data\tools.csv");
 
-
 % count configurations
 uc=unique(df2.configuration); % unique configuration
 nc=length(uc);                % number of configs
 %% Prima esplorazione e distribuzione delle misure indirette
-
-% line chart
-% linechart=figure;
-% for i=1:nc
-%     subplot(3,5,i)
-%     plot(table2array(df2(df2.configuration==uc(i),"event")),table2array(df2(df2.configuration==uc(i),"time_ms")))        
-%     title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
-% end
-% histogram
 
 hst=figure;
 for i=1:nc
@@ -34,7 +24,9 @@ for i=1:nc
     % title(strcat("Configuration",string(uc(i)), "distanza dal CM = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
     title(strcat("d_{CM} = ", string(table2array(df1(df1.configuration==uc(i),"distance_cm"))-50), " cm"))
 end
-%% Qual è l'incertezza sui tempi?
+% exporting plot
+saveas(hst,'..\img\histogram.png');
+%% Deviazione standard e scarti normalizzati
 % Per stimarla, calcolo la deviazione standard sui tempi per ogni configurazione
 
 % calcolo la deviazione standard dei tempi misurati
@@ -116,17 +108,8 @@ dr = 0.002; % meters
 
 % creating empty array
 tm=zeros(nc,1);     % tempi medi
-dtm=zeros(nc,1);    % error t
 d=zeros(nc,1);      % distance from CM
-dd=zeros(nc,1);     % error distance
 r=[0:0.0001:0.5];   % theoretical distance
-gc=zeros(nc,1);     % gravitational acceleration calculated
-dgc=zeros(nc,1);    % error gc
-regc=zeros(nc,1);   % relative error gravitational acceleration
-cfrg=zeros(nc,1);   % position first significant digit gravitational acceleration
-uomd=string(zeros(nc,1));   % uom distance
-uomg=string(zeros(nc,1));   % uom g
-uomt=string(zeros(nc,1));   % uom t
 
 % multiply *2, converting ms2s and rounding
 % df2.period_s=round(df2.time_ms.*2./1000,1)
@@ -180,6 +163,8 @@ chihist=figure;
 histfit(test)
 xlabel("t (ms)")
 ylabel("N")
+% export
+saveas(chihist,'..\img\chi.png');
 %%
 
 
@@ -231,6 +216,8 @@ hold on
 plot(r,tt)
 hold off
 legend('data','theoretical curve')
+saveas(plt1,'..\img\plot1.png');
+
 plt2=figure;
 errorbar(o4.distance_m,o4.mean_period,o4.sigma_t,o4.sigma_t,'.')
 xlabel('Distanza dal CM (m)')
@@ -242,6 +229,7 @@ hold off
 ylim([1.4 2.3])
 xlim([0.05 0.5])
 legend('data','theoretical curve')
+saveas(plt2,'..\img\plot2.png');
 % calcolare chi quadro su questo grafico
 % compute chi square
 chio4 = sum(((o4.mean_period-o4.teo_period)./o4.sigma_t).^2)
@@ -266,18 +254,17 @@ delta = n.*sum(x.^2) - (sum(x)).^2;
 
 % intercetta
 a = (   (sum(x.^2).*sum(y))  - (sum(x).*sum(x.*y))   )./delta
-
 % coefficiente angolare
 b = (   (n.*sum(x.*y)) - (sum(x).*sum(y))   )./delta
-plt3=figure;
-errorbar(x,o4.mean_period,o4.sigma_t,o4.sigma_t,'.')
-hold on
-plot(0:1,a+b.*(0:1)')
-hold off
-legend("data","fit",'Location','southeast')
-xlim([0.7 1])
-ylim([1.45 2.1])
+% sigma y eq 8.15 Taylor
+sigma_y = sqrt(sum((y - repelem(a,n,1) - repelem(b,n,1).*x).^2)./(n - 2)) %sigma_y = round(sigma_y,2)
+% errore su a eq. 8.16 Taylor
+sigma_a = sigma_y .* sqrt((sum(x.^2))./(delta))
+% errore su b eq. 8.17 Taylor
+sigma_b = sigma_y .* sqrt(n./delta)
+% plotting
 plt4=figure;
+subplot(1,2,1)
 plot(x,y,'o')
 hold on
 plot(0:1,a+b.*(0:1)')
@@ -285,12 +272,61 @@ hold off
 legend("data","fit",'Location','southeast')
 xlim([0.7 1])
 ylim([1.45 2.1])
+xlabel("x")
+ylabel("$y = \bar{T}$ (s)","Interpreter","latex")
+subplot(1,2,2)
+errorbar(x,y,repelem(sigma_y,length(y),1),repelem(sigma_y,length(y),1),'.')
+hold on
+plot(0:1,a+b.*(0:1)')
+hold off
+legend("data","fit",'Location','southeast')
+xlim([0.7 1])
+ylim([1.45 2.1])
+saveas(plt4,'..\img\plot4.png');
 % stimo g dal coefficiente angolare
 % gmq sta per "g minimi quadrati"
+
+% approssimo b in base alle cifre significative dei loro errori
+% sigma_b = round(sigma_b,2)
+% b = round(b,1)
 gmq = (2.*pi./b).^2
-% add coefficiente di pearson
+gmq_max = (2.*pi./(b-sigma_b)).^2
+gmq_min = (2.*pi./(b+sigma_b)).^2
+gmq_max - gmq
+gmq - gmq_min
+% propagazione erorre su gmq
+sigma_g = 8.*pi.^2.*sigma_b./b.^3
+sigma_g = round(sigma_g,1)
+gmq = round(gmq,1)
+t = abs(9.8-gmq)/sigma_g
+gplot1=figure;
+errorbar(1,gmq,sigma_g,sigma_g,'o')
+hold on
+plot(0:2,repelem(9.81,3,1))
+hold off
+ylim([6.5 10.5])
+set(gca,'XTick',[])
+legend("Stima","Valore accettato","Location","southeast")
+ylabel("g (m/s^2)")
+% export
+saveas(gplot1,'..\img\gplot1.png');
+%% 
+% il risultato ottenuto dal metodo dei minimi quadrati è $g = 8.4 \pm 0.8 \; 
+% m/s^2$ e dista 1.8 $\sigma$ dal valore accettato di $9.8 \; m/s^2$ (lo scarto 
+% normalizzato)
 
+% si può associare un errore a gmq, lo faccio dopo ma forse nono è
+% importante
 
+% add coefficiente di correlazione linear
+rl = sum((x - repelem(mean(x),length(x),1))  .*  (y - repelem(mean(y),length(y),1))) ./ (  sqrt(sum((x - repelem(mean(x),length(x),1)).^2) .* sum((y - repelem(mean(y),length(y),1)).^2))  );
+rl = round(rl,2)
+%% 
+% Dal coefficiente di combinazione lineare $r = 0.99$ è possibile comprendere 
+% come le grandezze x e y risultino linearmente correlate e dunque si adattano 
+% bene alla retta di 
+% 
+% 
 %% Determino g (media)
 
 % join df1 e df2
@@ -337,6 +373,8 @@ ylim([7.5 11])
 legend("Experimental data","Accepted value","Location","southeast")
 xlabel("Configuration")
 ylabel("g (m/s^2)")
+% export
+saveas(plt5,'..\img\plot5.png');
 %% Exporting
 
 % converting array to string
@@ -366,15 +404,6 @@ ylabel("g (m/s^2)")
 % writetable(output1,'..\data\output-data-1.csv','Delimiter',',','Encoding','UTF-8')
 % writetable(output2,'..\data\output-data-2.csv','Delimiter',',','Encoding','UTF-8')
 % writetable(output3,'..\data\output-data-3.csv','Delimiter',',','Encoding','UTF-8')
-
-% exporting img
-saveas(hst,'..\img\histogram.png');
-saveas(plt1,'..\img\plot1.png');
-saveas(plt2,'..\img\plot2.png');
-saveas(plt3,'..\img\plot3.png');
-saveas(plt4,'..\img\plot4.png');
-saveas(plt5,'..\img\plot5.png');
-saveas(chihist,'..\img\chi.png');
 
 % exporting mlx2m
 mlxloc = fullfile(pwd,'livescript.mlx');
