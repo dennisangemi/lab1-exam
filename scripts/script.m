@@ -219,18 +219,18 @@ ylabel('Periodo T (s)')
 xlim([0,0.5])
 ylim([0 5])
 hold on
-plot(r,tt)
+plot(r,tt,'LineWidth',1.1)
 hold off
 legend('data','theoretical curve')
 saveas(plt1,'..\img\plot1.png');
 
 plt2=figure;
-errorbar(o4.distance_m,o4.mean_period,o4.sigma_t,o4.sigma_t,'.')
+errorbar(o4.distance_m,o4.mean_period,o4.sigma_t,o4.sigma_t,'.','LineWidth',1.1)
 xlabel('Distanza dal CM (m)')
 ylabel('Periodo T (s)')
 xlim([0,0.5])
 hold on
-plot(r,tt)
+plot(r,tt,'LineWidth',1.1)
 hold off
 ylim([1.4 2.3])
 xlim([0.05 0.5])
@@ -272,9 +272,9 @@ sigma_b = sigma_y .* sqrt(n./delta)
 % plotting
 plt4=figure;
 subplot(1,2,1)
-plot(x,y,'o')
+plot(x,y,'o','LineWidth',1.1)
 hold on
-plot(0:1,a+b.*(0:1)')
+plot(0:1,a+b.*(0:1)','LineWidth',1.1)
 hold off
 legend("data","fit",'Location','southeast')
 xlim([0.7 1])
@@ -284,12 +284,14 @@ ylabel("$y = \bar{T}$ (s)","Interpreter","latex")
 subplot(1,2,2)
 errorbar(x,y,repelem(sigma_y,length(y),1),repelem(sigma_y,length(y),1),'.')
 hold on
-plot(0:1,a+b.*(0:1)')
+plot(0:1,a+b.*(0:1)','LineWidth',1.1)
+xlabel("x")
 hold off
 legend("data","fit",'Location','southeast')
 xlim([0.7 1])
 ylim([1.45 2.1])
-% saveas(plt4,'..\img\plot4.png');
+plt4.Position = [10 10 800 400];
+saveas(plt4,'..\img\plot4.png');
 % stimo g dal coefficiente angolare
 % gmq sta per "g minimi quadrati"
 
@@ -307,9 +309,9 @@ sigma_g = round(sigma_g,1)
 gmq = round(gmq,1)
 t = abs(9.8-gmq)/sigma_g
 gplot1=figure;
-errorbar(1,gmq,sigma_g,sigma_g,'o')
+errorbar(1,gmq,sigma_g,sigma_g,'o','LineWidth',1.1)
 hold on
-plot(0:2,repelem(9.81,3,1))
+plot(0:2,repelem(9.81,3,1),'LineWidth',1.1)
 hold off
 ylim([6.5 10.5])
 set(gca,'XTick',[])
@@ -371,9 +373,9 @@ mean(o5.sigma)
 %%
 % plotting
 plt5=figure;
-errorbar(o5.configuration,o5.g,o5.sigma,'.')
+errorbar(o5.configuration,o5.g,o5.sigma,'.','LineWidth',1.1)
 hold on
-plot(0:length(o5.configuration)+1,repelem(9.81,length(0:length(o5.configuration))+1,1))
+plot(0:length(o5.configuration)+1,repelem(9.81,length(0:length(o5.configuration))+1,1),'LineWidth',1.1)
 hold off
 xlim([0 height(o5)+1])
 ylim([7.5 11])
