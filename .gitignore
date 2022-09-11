@@ -2,3 +2,4 @@ scripts/update.R
 scripts/sort.R
 data/n-exp-data-2.csv
 data/t-exp-data-2.csv
+report/temp.tex

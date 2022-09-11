@@ -15,6 +15,8 @@ tools=readtable("..\data\tools.csv");
 % count configurations
 uc=unique(df2.configuration); % unique configuration
 nc=length(uc);                % number of configs
+%%
+df1
 %% Prima esplorazione e distribuzione delle misure indirette
 
 hst=figure;
@@ -166,8 +168,6 @@ ylabel("N")
 % export
 saveas(chihist,'..\img\chi.png');
 %%
-
-
 % calcolo gc2 con formula più corta (g calculated 2)
 % for i = 1:nc
 %     gc2(i) = (2.*pi./tm(i)).^2  .*  ((l.^2)/(12.*d(i)) + d(i));
@@ -176,7 +176,6 @@ saveas(chihist,'..\img\chi.png');
 
 % per ogni configurazione calcolo la media del periodo e la sua deviazione
 % standard
-
 
 
 sigma_t = zeros(nc,1);
@@ -205,6 +204,9 @@ tt=(2.*pi./sqrt(g)).*sqrt(((l.^2)./(12.*r))+r); % theoretical curve
 
 % preview
 o4
+% exporting
+writetable(o4,'..\data\output-data-2.csv','Delimiter',',','Encoding','UTF-8')
+
 % plotting
 plt1=figure;
 plot(o4.distance_m,o4.mean_period,'o')
@@ -232,15 +234,16 @@ legend('data','theoretical curve')
 saveas(plt2,'..\img\plot2.png');
 % calcolare chi quadro su questo grafico
 % compute chi square
-chio4 = sum(((o4.mean_period-o4.teo_period)./o4.sigma_t).^2)
+% chio4 = sum(((o4.mean_period-o4.teo_period)./o4.sigma_t).^2)
 % chi ridotto
-chio4./(height(o4)-1)
+% chio4./(height(o4)-1)
 %% Metodo dei minimi quadrati
 
 d = o4.distance_m;
 y = tm;
 x = sqrt(  (repelem(l,length(d))'.^2)./(12.*d) + d   );
 
+% scatterplot
 % plot y and x
 % plot(x,y,'o')
 % xlabel("x")
