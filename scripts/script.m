@@ -365,11 +365,14 @@ o5.sigma = round(o5.sigma,2);
 
 % preview
 o5
+% exporting
+writetable(o5,'..\data\output-data-5.csv','Delimiter',',','Encoding','UTF-8')
+
 % chi quadro
-cg = sum(((o5.g-repelem(9.81,height(o5))')./o5.sigma).^2)
+% cg = sum(((o5.g-repelem(9.81,height(o5))')./o5.sigma).^2)
 % mean g
-round(mean(o5.g),1)
-mean(o5.sigma)
+gm = round(mean(o5.g),1)
+dgm = mean(o5.sigma)
 %%
 % plotting
 plt5=figure;
@@ -384,6 +387,19 @@ xlabel("Configuration")
 ylabel("g (m/s^2)")
 % export
 saveas(plt5,'..\img\plot5.png');
+% compare gbest e gmean
+gplot2=figure;
+errorbar(1,gmq,sigma_g,sigma_g,'o','LineWidth',1.1)
+hold on
+errorbar(2,gm,round(dgm,1),round(dgm,1),'o','LineWidth',1.1)
+plot(0:3,repelem(9.81,length(0:3),1),'LineWidth',1.1)
+hold off
+ylim([6.5 10.5])
+set(gca,'XTick',[])
+legend("$g_{best}$","$\bar{g}$","Valore accettato","Location","southeast",'Interpreter','latex')
+ylabel("g (m/s^2)")
+% export
+saveas(gplot2,'..\img\gplot2.png');
 %% Exporting
 
 % converting array to string
