@@ -21,37 +21,6 @@ root
 └── 📄 README.md
 ```
 
-## Data dictionary and metadata
-
-Every file in `data` folder is described according to [frictionless data standards](https://frictionlessdata.io/standards/) in the [`datapackage.yaml`](https://github.com/indecis-it/data/blob/main/datapackage.yaml)
-
-### [📄 file.csv](#)
-
-- Path: `data/`
-- URL: https://raw.githubusercontent.com/#
-- Delimiter: `,`
-- Encoding: `UTF-8`
-
-field | type | description | example
--- | -- | -- | --
-id | integer | Source ID | 1
-title | string | Source title | Programma elettorale PD
-
-### Unit of measurement
-Units of measurement (column `uom`) are represented by alphanumeric codes according to [UNECE Recommendation 20](https://datahub.io/core/unece-units-of-measure). For more information you can visit the web page linked above.
-
-## How to access data
-If you wanna use these data in your works, you can follow these easy instructions. You have to locate the raw URL of the file you are interested in and paste it inside the formulas. Remember to read the [license](#license) and cite the author
-
-### MATLAB
-```matlab
-df = readtable("#")
-```
-
-### R
-```r
-df <- read.csv("#")
-```
 
 ## License
 Data, code and images are licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). <br> <br>
