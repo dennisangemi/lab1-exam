@@ -17,7 +17,6 @@ root
 │   ├── 📄 report.tex
 │   └── 📄 report.pdf
 ├── 📂 scripts
-├── 📄 datapackage.yaml
 └── 📄 README.md
 ```
 
